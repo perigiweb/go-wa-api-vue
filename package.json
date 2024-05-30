@@ -1,0 +1,32 @@
+{
+  "name": "wapi-f",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-pro": "file:../../assets/fortawesome-fontawesome-pro-5.15.4.tgz",
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/pro-duotone-svg-icons": "file:../../assets/fortawesome-pro-duotone-svg-icons-5.15.4.tgz",
+    "@fortawesome/pro-light-svg-icons": "file:../../assets/fortawesome-pro-light-svg-icons-5.15.4.tgz",
+    "@fortawesome/pro-regular-svg-icons": "file:../../assets/fortawesome-pro-regular-svg-icons-5.15.4.tgz",
+    "@fortawesome/pro-solid-svg-icons": "file:../../assets/fortawesome-pro-solid-svg-icons-5.15.4.tgz",
+    "@fortawesome/vue-fontawesome": "^3.0.6",
+    "@unocss/reset": "^0.58.5",
+    "ky": "^1.2.2",
+    "libphonenumber-js": "^1.10.59",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.19",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "sass": "^1.71.1",
+    "unocss": "^0.58.5",
+    "vite": "^5.1.4"
+  }
+}
