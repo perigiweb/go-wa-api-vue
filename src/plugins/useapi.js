@@ -39,6 +39,7 @@ export default function createApi(options) {
 
       delete reqOptions.useAuthToken
     }
+    reqOptions.retry = 0
 
     try {
       return await ky(input, reqOptions).json()

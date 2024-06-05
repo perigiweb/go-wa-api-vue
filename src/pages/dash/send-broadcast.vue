@@ -1,13 +1,6 @@
 <template>
   <div class="flex-1 h-full overflow-y-auto p-4">
-    <div v-if="alert" class="fixed top-5 right-8 max-w-400px leading-none">
-      <div :class="alertClass">
-        <div class="flex-1">{{ alert.text }}</div>
-        <button type="button" @click.prevent="alert = null"
-          class="px-2 py-1 bg-transparent border-0 text-slate-800"
-        ><font-awesome-icon icon="fad fa-times"></font-awesome-icon></button>
-      </div>
-    </div>
+    <alert v-if="alert" :type="alert.type" :autoclose="alert.autoclose || 5" @close="alert = null">{{ alert.text }}</alert>
 
     <div class="w-full max-w-540px mt-2 mb-6 rounded bg-slate-800 mx-auto">
       <div class="border-0 border-b border-solid border-slate-700 pb-2 pt-4 px-4 flex justify-between items-center">
@@ -66,6 +59,11 @@
           </div>
         </div>
         <div>
+          <label for="sent_started_at" class="text-slate-400 font-size-xs block mb-1">Sent Started At</label>
+          <input type="datetime-local" id="sent_started_at" v-model="sentStartedAt"
+            class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm invalid:border-red-400 valid:border-green-400">
+        </div>
+        <div>
           <button type="submit" class="btn btn-green" :disabled="isSending">{{ btnText }}</button>
         </div>
       </form>
@@ -78,9 +76,12 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { useApi } from '../../plugins/useapi'
+import { fmtDateForInput } from '../../utils'
 
 import { useDeviceStore } from '../../stores/device'
 import { useContactStore } from '../../stores/contact'
+
+import Alert from '../../components/Alert.vue'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -93,6 +94,10 @@ const router = useRouter()
 const { device, waContacts } = storeToRefs(useDeviceStore())
 const { totalContact }       = storeToRefs(useContactStore())
 
+const now = new Date()
+now.setHours(now.getHours() + 7)
+console.log(fmtDateForInput(now), (new Date()).getTimezoneOffset())
+
 const campaignName   = ref('')
 const contactType    = ref('c')
 const contactFilter  = ref('a')
@@ -100,6 +105,7 @@ const filterValue    = ref('')
 const phones         = ref('')
 const message        = ref('')
 const uploadedFile   = ref(null)
+const sentStartedAt  = ref(fmtDateForInput(now))
 const isSending      = ref(false)
 const btnText        = ref('Send')
 const alert          = ref(null)
@@ -181,7 +187,8 @@ const sendBroadcast = async () => {
   btnText.value = 'Sending...'
 
   const p = phones.value.split(',').map(x => x.trim().replace(/^0/, '62')).filter(x => x !== '')
-
+  const d = new Date(sentStartedAt.value)
+  d.setHours(d.getHours() - 7)
   const data = {
     campaignName: campaignName.value.trim(),
     contactType: contactType.value,
@@ -190,7 +197,8 @@ const sendBroadcast = async () => {
     phones: p.length == 0 ? null:p,
     message: message.value,
     mType,
-    uploadedFile: uploadedFile.value
+    media: uploadedFile.value,
+    sentStartedAt: d.toISOString()
   }
 
   console.log({data})

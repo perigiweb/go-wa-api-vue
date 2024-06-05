@@ -2,7 +2,7 @@
   <div class="fixed top-5 right-8 max-w-400px leading-none">
     <div :class="alertClass">
       <div class="flex-1"><slot /></div>
-      <button type="button" @click.prevent="alert = null"
+      <button type="button" @click.prevent="$emit('close')"
         class="px-2 py-1 bg-transparent border-0"
       ><font-awesome-icon icon="fad fa-times"></font-awesome-icon></button>
     </div>
@@ -17,7 +17,8 @@ import { faTimes } from '@fortawesome/pro-duotone-svg-icons'
 
 library.add(faTimes)
 
-const props = defineProps(['type'])
+const props = defineProps(['type', 'autoclose'])
+const emit  = defineEmits(['close'])
 
 const alertClass = computed(() => {
   let c = ''
@@ -38,4 +39,14 @@ const alertClass = computed(() => {
 
   return c
 })
+
+if (props.autoclose){
+  const timeOut = parseInt(props.autoclose)
+  if (timeOut === 0){
+    timeOut = 3;
+  }
+  setTimeout(() => {
+    emit('close')
+  }, timeOut * 1000)
+}
 </script>
