@@ -5,15 +5,16 @@ import { useApi } from '../plugins/useapi'
 export const useContactStore = defineStore('contact', () => {
   const api = useApi()
 
-  const contacts    = ref([])
-  const contact     = ref({id: null, userId: 0, name: '', phone: '', inWA: 0})
-  const total       = ref(0)
-  const limit       = ref(100)
-  const nextPage    = ref('')
-  const prevPage    = ref('')
-  const currentPage = ref(1)
-  const searchQuery = ref('')
+  const contacts         = ref([])
+  const contact          = ref({id: null, userId: 0, name: '', phone: '', inWA: 0, groups: []})
+  const total            = ref(0)
+  const limit            = ref(100)
+  const nextPage         = ref('')
+  const prevPage         = ref('')
+  const currentPage      = ref(1)
+  const searchQuery      = ref('')
   const totalContactInWA = ref(0)
+  const contactGroups    = ref([])
 
   const hasContacts = computed(() => contacts.value.length ? true:false)
   const dataOfTotal = computed(() => {
@@ -80,14 +81,16 @@ export const useContactStore = defineStore('contact', () => {
       json: contact.value,
       useAuthToken: true
     })
-    if (response.status){
-      if (!contact.value.id)
-        contacts.value.unshift(response.data)
 
-      return true
-    }
+    return response
+  }
+  async function importContact(uploadedFile){
+    const response = await api.post('me/contact/import', {
+      useAuthToken: true,
+      json: {uploadedFile}
+    })
 
-    throw new Error(response.message)
+    return response
   }
   async function delContact(contactId){
     const response = await api.delete(`me/contact/${contactId}`, {useAuthToken: true})
@@ -98,10 +101,18 @@ export const useContactStore = defineStore('contact', () => {
 
     throw new Error(response.message)
   }
+  async function fetchContactGroups(){
+    const response = await api.get(`me/contact/groups`, {useAuthToken: true})
+    if (response.status){
+      contactGroups.value = response.data
+    }
+  }
+  fetchContactGroups()
 
   return {
     contacts,
     contact,
+    contactGroups,
     total,
     totalContact: totalContactInWA,
     limit,
@@ -114,6 +125,7 @@ export const useContactStore = defineStore('contact', () => {
     getContacts,
     getContact,
     saveContact,
+    importContact,
     delContact
   }
 })

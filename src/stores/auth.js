@@ -67,8 +67,9 @@ export const useAuthStore = defineStore('auth', () => {
 
     return true
   })
-  const userId   = computed(() => payload.value?.userId || 0)
-  const userName = computed(() => payload.value?.name || '')
+  const userId    = computed(() => payload.value?.userId || 0)
+  const userName  = computed(() => payload.value?.name || '')
+  const userEmail = computed(() => payload.value?.email || '')
 
   const isTokenExpired = () => {
     const tokenExpDate = new Date(payload.value.exp * 1000)
@@ -93,6 +94,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     return token.value
   }
+
   function setToken(jwtToken, jwtRefreshToken) {
     token.value = jwtToken
     refreshToken.value = jwtRefreshToken
@@ -101,6 +103,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem(TOKEN_KEY, token.value)
     localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken.value)
   }
+
   function deleteToken() {
     token.value = null
     refreshToken.value = null
@@ -109,6 +112,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(REFRESH_TOKEN_KEY)
   }
+
   async function signIn(userEmail, userPassword){
     authErrMsg.value = null
     const r = await api.post('sign-in', {json: {userEmail, userPassword}})
@@ -122,6 +126,7 @@ export const useAuthStore = defineStore('auth', () => {
     authErrMsg.value = r.message
     return false
   }
+
   async function signOut(){
     const sessionId = payload.value.session
 
@@ -140,6 +145,7 @@ export const useAuthStore = defineStore('auth', () => {
     isLoggedIn,
     userId,
     userName,
+    userEmail,
     getToken,
     deleteToken,
     signIn,

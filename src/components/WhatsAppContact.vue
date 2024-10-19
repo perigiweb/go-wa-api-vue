@@ -22,7 +22,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watchEffect } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDeviceStore } from '../stores/device'
 import { fmtPhoneFromJID } from '../utils'
@@ -72,5 +72,9 @@ watchEffect(() => {
   } else {
     waContacts.value = deviceStore.waContacts
   }
+})
+
+onMounted(() => {
+  deviceStore.getDeviceContacts()
 })
 </script>

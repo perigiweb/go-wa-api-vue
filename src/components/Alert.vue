@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-5 right-8 max-w-400px leading-none">
+  <div class="fixed top-5 right-8 max-w-400px leading-none z-1000">
     <div :class="alertClass">
       <div class="flex-1"><slot /></div>
       <button type="button" @click.prevent="$emit('close')"
@@ -21,9 +21,8 @@ const props = defineProps(['type', 'autoclose'])
 const emit  = defineEmits(['close'])
 
 const alertClass = computed(() => {
-  let c = ''
+  let c = 'p-3 text-sm rounded w-auto mx-auto flex gap-3 justify-between items-center'
   if (props.type){
-    c = `${c} p-3 text-sm rounded w-auto mx-auto flex gap-3 justify-between items-center`
     switch(props.type){
       case 'error':
         c = `${c} bg-red-300 text-red-900`
@@ -41,12 +40,11 @@ const alertClass = computed(() => {
 })
 
 if (props.autoclose){
-  const timeOut = parseInt(props.autoclose)
-  if (timeOut === 0){
-    timeOut = 3;
+  let timeOut = parseInt(props.autoclose)
+  if (timeOut >= 0){
+    setTimeout(() => {
+      emit('close')
+    }, timeOut * 1000)
   }
-  setTimeout(() => {
-    emit('close')
-  }, timeOut * 1000)
 }
 </script>

@@ -23,6 +23,7 @@ import { ref, computed, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useDeviceStore } from '../../stores/device'
+
 import Loading from '../../components/Loading.vue'
 
 const { devices, device, qrImage, qrImageTimeout, isWALoggedIn } = storeToRefs(useDeviceStore())

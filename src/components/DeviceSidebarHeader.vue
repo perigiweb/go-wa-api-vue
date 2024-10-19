@@ -6,10 +6,14 @@
     </div>
     <div class="flex items-center justify-end gap-3">
       <router-link :to="{name: 'wa-state', params: {deviceId: $route.params.deviceId}}" class="text-center no-underline">
+        <font-awesome-icon icon="fad fa-comments" class="block mx-auto"></font-awesome-icon>
+        <span class="block text-xs">Chats</span>
+      </router-link>
+      <router-link :to="{name: 'wa-state', params: {deviceId: $route.params.deviceId, c: 'contacts'}}" class="text-center no-underline">
         <font-awesome-icon icon="fad fa-address-book" class="block mx-auto"></font-awesome-icon>
         <span class="block text-xs">Contacts</span>
       </router-link>
-      <router-link :to="{name: 'wa-broadcasts', params: {deviceId: $route.params.deviceId}}" class="text-center no-underline">
+      <router-link :to="{name: 'wa-state', params: {deviceId: $route.params.deviceId, c: 'broadcasts'}}" class="text-center no-underline">
         <font-awesome-icon icon="fad fa-bullhorn" class="block mx-auto"></font-awesome-icon>
         <span class="block text-xs text-center">Broadcast</span>
       </router-link>
@@ -19,9 +23,9 @@
 <script setup>
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faAddressBook, faBullhorn } from '@fortawesome/pro-duotone-svg-icons'
+import { faAddressBook, faBullhorn, faComments } from '@fortawesome/pro-duotone-svg-icons'
 
-library.add(faAddressBook, faBullhorn)
+library.add(faAddressBook, faBullhorn, faComments)
 
 defineProps({
   title: String,

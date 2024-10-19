@@ -87,7 +87,7 @@ export const useDeviceStore = defineStore('device', () => {
 
     if (qrImage.value == "LoggedIn"){
       device.value.isLoggedIn = true
-      getDeviceContacts.call()
+      //getDeviceContacts.call()
     }
   }
 

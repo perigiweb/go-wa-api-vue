@@ -19,7 +19,7 @@
         </div>
         <div>
           <label for="message" class="text-slate-400 font-size-xs block mb-1">Message</label>
-          <textarea id="message" rows="7" placeholder="Message" v-model="message" required
+          <textarea id="message" rows="7" placeholder="Message" v-model="message" required @keyup="isTyping" :disabled="!isValidPhone"
             class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-size-sm invalid:border-red-400 valid:border-green-400"></textarea>
         </div>
         <div>
@@ -57,8 +57,8 @@ import { faTimes } from '@fortawesome/pro-duotone-svg-icons'
 
 library.add(faTimes)
 
+const { device, waContacts } = storeToRefs(useDeviceStore())
 const { contact }    = storeToRefs(useContactStore())
-const { device, waContacts }     = storeToRefs(useDeviceStore())
 const { getContact } = useContactStore()
 const router         = useRouter()
 const route          = useRoute()
@@ -69,6 +69,9 @@ const isSending      = ref(false)
 const btnText        = ref('Send')
 const alert          = ref(null)
 const contactName    = ref('')
+const isValidPhone   = ref(false)
+const chatState      = ref('paused')
+const typingTimer    = ref(null)
 
 const alertClass = computed(() => {
   let c = ''
@@ -185,6 +188,9 @@ const sendMessage = async () => {
   }
 
   if (recipient.value.inWA){
+    if (typingTimer.value){
+      clearTimeout(typingTimer.value)
+    }
     btnText.value = 'Sending...'
     const data = {
       recipient: recipient.value.phone,
@@ -211,8 +217,36 @@ const sendMessage = async () => {
   }
 
   isSending.value = false
-  btnText.value = 'Send'
+  btnText.value   = 'Send'
 }
+
+const sendChatState = (state) => {
+  const payload = {
+    phone: recipient.value.phone,
+    state,
+    media: ''
+  }
+
+  post(`me/wa/${device.value.id}/send-chat-presence`, {
+    json: payload,
+    useAuthToken: true
+  })
+}
+const isTyping = () => {
+  chatState.value = 'composing'
+  if (typingTimer.value){
+    clearTimeout(typingTimer.value)
+  }
+  //console.log((new Date()).toLocaleTimeString())
+  typingTimer.value = setTimeout(() => {
+    chatState.value = 'paused'
+    clearTimeout(typingTimer.value)
+  }, 3000)
+}
+watch(() => chatState.value, (newChatState) => {
+  console.log((new Date()).toLocaleTimeString(), newChatState)
+  sendChatState(newChatState)
+})
 
 watch(() => recipient.value.phone, (newPhone, oldPhone) => {
   if (newPhone != oldPhone){
@@ -221,6 +255,8 @@ watch(() => recipient.value.phone, (newPhone, oldPhone) => {
     if (contact.value && formatJID(contact.value.phone) == newPhone){
       recipient.value.inWA = contact.value.inWA
     }
+
+    isValidPhone.value = /^62(\d+){9,13}/.test(recipient.value.phone)
   }
 })
 

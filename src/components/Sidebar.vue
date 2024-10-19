@@ -6,11 +6,16 @@
       <div v-if="error" class="bg-red-300 text-red-900 p-2 text-size-sm">{{ error }}</div>
       <div v-if="devices.length" class="flex flex-col">
         <div v-for="device in devices" class="relative border-0 border-b border-solid border-color-slate-800">
-          <button class="absolute right-5px bg-transparent border-0 cursor-pointer h-full" @click.prevent="removeDevice(device.id)"><font-awesome-icon icon="fad fa-trash" class="text-red-400"></font-awesome-icon></button>
-          <router-link class="flex-1 btn-no-border block hover:bg-slate-800 leading-none py-3" :to="{name: 'wa-state', params: {deviceId: device.id}}">
+          <button class="absolute right-5px top-3 bg-transparent border-0 cursor-pointer" @click.prevent="removeDevice(device.id)"><font-awesome-icon icon="fad fa-trash" class="text-red-400"></font-awesome-icon></button>
+          <router-link class="btn-no-border block hover:bg-slate-800 leading-none py-3"
+            :to="{name: 'wa-state', params: {deviceId: device.id}}">
             <b class="block">{{ device.name }}</b>
             <small v-if="device.jid">{{ fmtPhoneFromJID(device.jid) }}</small>
           </router-link>
+          <router-link class="btn-no-border block hover:bg-slate-800 leading-none pr-3 pl-6"
+            :to="{name: 'wa-send', params: {deviceId: device.id}}">&raquo; Send Message</router-link>
+          <router-link class="btn-no-border block hover:bg-slate-800 leading-none pr-3 pl-6"
+            :to="{name: 'wa-broadcast', params: {deviceId: device.id}}">&raquo; Send Broadcast</router-link>
         </div>
         <router-link :to="{name: 'wa-new'}" class="btn-no-border hover:bg-slate-800">New WhatsApp</router-link>
       </div>
@@ -19,6 +24,10 @@
       <router-link :to="{name: 'contacts'}" class="btn-no-border bg-transparent hover:bg-slate-800">
         <font-awesome-icon icon="fad fa-address-book"></font-awesome-icon>
         Contacts
+      </router-link>
+      <router-link :to="{name: 'my-account'}" class="btn-no-border bg-transparent hover:bg-slate-800">
+        <font-awesome-icon icon="fad fa-user"></font-awesome-icon>
+        My Account
       </router-link>
       <button type="button" class="btn-no-border text-left border-0 bg-transparent text-light hover:bg-slate-800" @click.prevent="actionSignOut">
         <font-awesome-icon icon="fad fa-sign-out" class="text-red-500"></font-awesome-icon> Sign Out
@@ -38,9 +47,9 @@ import Loading from './Loading.vue'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faSignOut, faAddressBook, faTrash } from '@fortawesome/pro-duotone-svg-icons'
+import { faSignOut, faAddressBook, faTrash, faUser } from '@fortawesome/pro-duotone-svg-icons'
 
-library.add(faSignOut, faAddressBook, faTrash)
+library.add(faSignOut, faAddressBook, faTrash, faUser)
 
 const { devices } = storeToRefs(useDeviceStore())
 const { getDevices, removeDevice } = useDeviceStore()

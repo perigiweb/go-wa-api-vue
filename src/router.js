@@ -39,6 +39,14 @@ const routes = [
         component: () => import('./pages/dash/index.vue'),
       },
       {
+        path: 'my-account',
+        name: 'my-account',
+        component: () => import('./pages/dash/my-account.vue'),
+        meta: {
+          authRequired: true
+        }
+      },
+      {
         path: 'contacts',
         name: 'contacts',
         component: () => import('./pages/dash/contacts.vue'),
@@ -62,7 +70,7 @@ const routes = [
         },
         children: [
           {
-            path: "",
+            path: ":c(contacts|broadcasts)?",
             name: 'wa-state',
             component: () => import('./pages/dash/loggedin.vue'),
             meta: {
@@ -77,6 +85,7 @@ const routes = [
               authRequired: true
             }
           },
+          /*
           {
             path: 'broadcasts',
             name: 'wa-broadcasts',
@@ -84,7 +93,7 @@ const routes = [
             meta: {
               authRequired: true
             }
-          },
+          },*/
           {
             path: 'broadcast',
             name: 'wa-broadcast',

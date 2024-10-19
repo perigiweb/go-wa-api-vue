@@ -7,15 +7,16 @@
         <h3 class="font-bold text-lg">Send Broadcast</h3>
         <button type="button" @click.prevent="closeMsgForm" class="border-0 py-1 px-2 cursor-pointer bg-transparent text-white"><font-awesome-icon icon="fad fa-times"></font-awesome-icon></button>
       </div>
-      <form @submit.prevent="sendBroadcast" method="post" class="flex flex-1 flex-col space-y-4 p-4">
+      <form @submit.prevent="sendBroadcast" method="post" class="flex flex-1 flex-col space-y-4 p-4 group" novalidate>
         <div>
           <label for="campaignName" class="text-slate-400 font-size-xs block mb-1">Campaign Name</label>
-          <input required type="text" name="campaignName" id="campaignName" v-model="campaignName" class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm invalid:border-red-400 valid:border-green-400">
-          <p v-if="errors.CampaignName" class="text-red-300 text-sm">{{ errors.CampaignName }}</p>
+          <input required type="text" name="campaignName" id="campaignName" v-model="campaignName"
+            class="peer border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm group-[.was-validated]:invalid:border-red-400 group-[.was-validated]:valid:border-green-400">
+          <p class="hidden text-red-300 text-sm group-[.was-validated]:peer-invalid:block">{{ errors.CampaignName||'Campaign Name is required field.' }}</p>
         </div>
         <div>
           <label for="contactType" class="text-slate-400 font-size-xs block mb-1">Recipient</label>
-          <select v-model="contactType" name="contactType" id="contactType" class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm invalid:border-red-400 valid:border-green-400">
+          <select v-model="contactType" name="contactType" id="contactType" class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm group-[.was-validated]:invalid:border-red-400 group-[.was-validated]:valid:border-green-400">
             <option value="w">WhatsApp Contacts ({{ waContacts.length }})</option>
             <option value="c">Contacts ({{ totalContact }})</option>
             <option value="p">Phone Number</option>
@@ -23,27 +24,37 @@
         </div>
         <div>
           <div v-if="useContactFilter" class="flex gap-3">
-            <select v-model="contactFilter" :disabled="!useContactFilter" name="contactFilter" id="contactFilter"
-              class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm invalid:border-red-400 valid:border-green-400">
-              <option value="a">All Contacts</option>
-              <option value="p">Phone Start With</option>
-              <option value="n">Name Start With</option>
-              <option v-if="contactType == 'c'" value="t">Contact Tag</option>
-            </select>
-            <input type="text" v-model="filterValue" v-if="contactFilter !== 'a'" required :disabled="!useContactFilter && contactFilter !== 'a'" name="filterValue" class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm invalid:border-red-400 valid:border-green-400">
+            <div>
+              <select v-model="contactFilter" :disabled="!useContactFilter" name="contactFilter" id="contactFilter"
+                class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm group-[.was-validated]:invalid:border-red-400 group-[.was-validated]:valid:border-green-400">
+                <option value="a">All Contacts</option>
+                <option value="p">Phone Start With</option>
+                <option value="n">Name Start With</option>
+                <option v-if="contactType == 'c'" value="g">Contact Group</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <input type="text" v-model="filterValue" v-if="contactFilter !== 'a'" :list="contactGroupsData" required
+                :disabled="!useContactFilter && contactFilter !== 'a'" name="filterValue"
+                class="peer border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm group-[.was-validated]:invalid:border-red-400 group-[.was-validated]:valid:border-green-400">
+              <p class="hidden text-red-300 text-sm group-[.was-validated]:peer-invalid:block">{{ errors.filterValue||'Filter Value is required field.' }}</p>
+            </div>
           </div>
           <div v-if="contactType === 'p'" class="">
-            <input type="text" name="phones" v-model="phones" :disabled="!(contactType === 'p')" required placeholder="6281122334455, 62895678909878" class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm invalid:border-red-400 valid:border-green-400">
+            <input type="text" name="phones" v-model="phones" :disabled="!(contactType === 'p')" required
+              placeholder="6281122334455, 62895678909878"
+              class="peer border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm group-[.was-validated]:invalid:border-red-400 group-[.was-validated]:valid:border-green-400">
+            <p class="hidden text-red-300 text-sm group-[.was-validated]:peer-invalid:block">{{ errors.Phones||'Phone Number is required field.' }}</p>
           </div>
         </div>
         <div>
           <div class="flex justify-between items-center mb-1">
-            <label for="message" class="text-slate-400 font-size-xs block">Message</label>
+            <label for="message" class="text-slate-400 font-size-xs block">Message (min 100 characters)</label>
             <div class="text-slate-300 font-size-xs">{{ messageLength }}</div>
           </div>
           <textarea id="message" rows="7" placeholder="Message" v-model="message" required minlength="100"
-            class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm invalid:border-red-400 valid:border-green-400"></textarea>
-          <p v-if="errors.Message" class="text-red-300 text-sm">{{ errors.Message }}</p>
+            class="peer border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm group-[.was-validated]:invalid:border-red-400 group-[.was-validated]:valid:border-green-400"></textarea>
+          <p class="hidden text-red-300 text-sm group-[.was-validated]:peer-invalid:block">{{ errors.Message||"Message is required and mininal 100 characters." }}</p>
         </div>
         <div>
           <label for="file" class="text-slate-400 font-size-xs block mb-1">Photo</label>
@@ -61,7 +72,7 @@
         <div>
           <label for="sent_started_at" class="text-slate-400 font-size-xs block mb-1">Sent Started At</label>
           <input type="datetime-local" id="sent_started_at" v-model="sentStartedAt"
-            class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm invalid:border-red-400 valid:border-green-400">
+            class="border border-slate-400 bg-slate-700 text-slate-100 rounded py-2 px-3 w-full text-sm group-[.was-validated]:invalid:border-red-400 group-[.was-validated]:valid:border-green-400">
         </div>
         <div>
           <button type="submit" class="btn btn-green" :disabled="isSending">{{ btnText }}</button>
@@ -69,6 +80,9 @@
       </form>
     </div>
   </div>
+  <datalist id="contact-groups">
+    <option v-for="cg in contactGroups" :value="cg.name"></option>
+  </datalist>
 </template>
 <script setup>
 import { computed, ref } from 'vue'
@@ -91,12 +105,11 @@ library.add(faTimes)
 
 const router = useRouter()
 
-const { device, waContacts } = storeToRefs(useDeviceStore())
-const { totalContact }       = storeToRefs(useContactStore())
+const { device, waContacts }          = storeToRefs(useDeviceStore())
+const { totalContact, contactGroups } = storeToRefs(useContactStore())
 
 const now = new Date()
 now.setHours(now.getHours() + 7)
-console.log(fmtDateForInput(now), (new Date()).getTimezoneOffset())
 
 const campaignName   = ref('')
 const contactType    = ref('c')
@@ -112,28 +125,14 @@ const alert          = ref(null)
 const errors         = ref({})
 
 const messageLength = computed(() => message.value.length)
-const alertClass = computed(() => {
-  let c = ''
-  if (alert.value){
-    c = `${c} p-3 text-sm rounded w-auto mx-auto flex gap-3 justify-between items-center`
-    switch(alert.value.type){
-      case 'error':
-        c = `${c} bg-red-300 text-red-900`
-      break
-      case 'success':
-        c = `${c} bg-emerald-700 text-white`
-      break
-    }
-  }
-
-  return c
-})
 const useContactFilter = computed(() => (contactType.value === 'w' || contactType.value === 'c'))
+const contactGroupsData = computed(() => contactFilter.value == 'g' ? 'contact-groups':null)
 const closeMsgForm = () => {
   router.push({
-    name: 'wa-broadcasts',
+    name: 'wa-state',
     params: {
-      deviceId: device.id
+      deviceId: device.id,
+      c: 'broadcasts'
     }
   })
 }
@@ -176,8 +175,13 @@ const processFile = event => {
 }
 
 const { post } = useApi()
-const sendBroadcast = async () => {
+const sendBroadcast = async (event) => {
   errors.value = {}
+
+  if ( !event.target.checkValidity()){
+    event.target.classList.add('was-validated')
+    return false
+  }
 
   const mType = uploadedFile.value ? 'media':'text'
   message.value = message.value.trim()
@@ -188,12 +192,25 @@ const sendBroadcast = async () => {
 
   const p = phones.value.split(',').map(x => x.trim().replace(/^0/, '62')).filter(x => x !== '')
   const d = new Date(sentStartedAt.value)
+  let fv = filterValue.value.trim()
+  if (contactFilter.value === 'g'){
+    const cg = contactGroups.value.filter(z => z.name === fv)[0] || null
+    if ( !cg){
+      alert.value = {
+        type: 'error',
+        text: `Contact group with value: ${filterValue.value} not found.`
+      }
+      return false
+    }
+
+    fv = `${cg.id}:${cg.name}`
+  }
   d.setHours(d.getHours() - 7)
   const data = {
     campaignName: campaignName.value.trim(),
     contactType: contactType.value,
     contactFilter: contactFilter.value,
-    filterValue: filterValue.value.trim(),
+    filterValue: fv,
     phones: p.length == 0 ? null:p,
     message: message.value,
     mType,
@@ -201,15 +218,11 @@ const sendBroadcast = async () => {
     sentStartedAt: d.toISOString()
   }
 
-  console.log({data})
-
   const res = await post(`me/wa/${device.value.id}/broadcast`, {
     json: data,
     timeout: 30000,
     useAuthToken: true
   })
-
-  console.log(res, typeof res.message)
 
   if (typeof res.message === 'object'){
     for(const i in res.message){
@@ -217,7 +230,6 @@ const sendBroadcast = async () => {
       const k = i.split('.')[1]
 
       errors.value[k] = m
-      console.log(i, res.message[i])
     }
   } else {
     alert.value = {
